@@ -81,7 +81,6 @@ function showScreen(which) {
 function renderQuestion() {
   const total = cfg.count;
 
-  // Guard: ако attempt е приключил/занулен или индексът е извън масива
   const q = attempt?.questions?.[currentIndex];
   if (!q) {
     finish("done");
@@ -95,19 +94,16 @@ function renderQuestion() {
 
   ui.answerInput.value = "";
   ui.answerInput.disabled = false;
-  ui.answerInput.focus({ preventScroll: true });
-  ui.answerInput.select();
-
-
 
   ui.feedback.textContent = "";
   ui.feedback.classList.remove("good", "bad");
 
+  // Най-стабилно за мобилни: фокус след tick
   setTimeout(() => {
-  ui.answerInput.focus({ preventScroll: true });
-  ui.answerInput.select();
-}, 0);
-
+    ui.answerInput.focus();
+    // click помага на iOS да покаже клавиатурата
+    ui.answerInput.click();
+  }, 0);
 }
 
 
