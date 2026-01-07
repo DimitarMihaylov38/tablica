@@ -95,10 +95,19 @@ function renderQuestion() {
 
   ui.answerInput.value = "";
   ui.answerInput.disabled = false;
-  ui.answerInput.focus();
+  ui.answerInput.focus({ preventScroll: true });
+  ui.answerInput.select();
+
+
 
   ui.feedback.textContent = "";
   ui.feedback.classList.remove("good", "bad");
+
+  setTimeout(() => {
+  ui.answerInput.focus({ preventScroll: true });
+  ui.answerInput.select();
+}, 0);
+
 }
 
 
@@ -231,6 +240,7 @@ async function checkAndNext() {
   setFeedback(ok, correct);
 
   ui.answerInput.disabled = true;
+  renderQuestion();
 
   const isLast = currentIndex === cfg.count - 1;
 
@@ -337,10 +347,9 @@ async function finish(reason) {
   await refreshLeaderboard();
 }
 
-
-
 function wire() {
   ui.startBtn.addEventListener("click", () => start().catch(e => alert(e.message)));
+
   ui.againBtn.addEventListener("click", () => {
     showScreen("start");
     ui.timeLeft.textContent = String(cfg.durationSec);
@@ -349,19 +358,25 @@ function wire() {
     finishing = false;
   });
 
+  // Enter/Done = OK
   ui.answerInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       checkAndNext().catch(err => alert(err.message));
     }
-    const okBtn = document.getElementById("okBtn");
-if (okBtn) {
-  okBtn.addEventListener("click", () => checkAndNext().catch(err => alert(err.message)));
-}
-
   });
 
+  // OK бутон (само веднъж)
+  const okBtn = document.getElementById("okBtn");
+  if (okBtn) {
+    okBtn.addEventListener("click", (e) => {
+      e.preventDefault();      // да не прави submit/scroll
+      okBtn.blur();            // да не остава фокус на бутона
+      checkAndNext().catch(err => alert(err.message));
+    });
+  }
 }
+
 
 (async function main() {
   await loadConfig();
