@@ -1,0 +1,9 @@
+{
+  "name": "times-table-quiz-2-9",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0"
+  }
+}
+

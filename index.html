@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="bg">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Таблица за умножение (2–9)</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">×</div>
+        <div>
+          <div class="title">Таблица за умножение</div>
+          <div class="subtitle" id="subtitle">20 задачи • 60 сек • 2–9</div>
+        </div>
+      </div>
+
+      <div class="hud">
+        <div class="pill">⏱️ <span id="timeLeft">60</span>s</div>
+        <div class="pill"><span id="progress">0/20</span></div>
+      </div>
+    </header>
+
+    <section class="card" id="startCard">
+      <h1 class="h1">Бърз тест</h1>
+      <p class="muted"></p>
+
+     <label class="field">
+  <span>Име</span>
+  <input
+    id="nickname"
+    maxlength="16"
+    placeholder="можеш да се подпишеш"
+    autocomplete="nickname"
+  />
+</label>
+
+
+      <button id="startBtn" class="btn btn-primary">Старт</button>
+
+      <div class="leaderboard">
+        <div class="row space">
+          <h2 class="h2 m0">Top 20</h2>
+        </div>
+        <div id="lb" class="lb"></div>
+      </div>
+    </section>
+
+   <section class="card" id="quizCard" hidden>
+  <div class="questionTop">
+    <div class="qLabel">Задача</div>
+    <div class="qValue" id="qIndex">1/20</div>
+  </div>
+
+  <div class="question">
+    <div class="expr" id="expr">2 × 2</div>
+    <div class="eq">=</div>
+    <input
+      id="answerInput"
+      class="answer"
+      type="number"
+      inputmode="numeric"
+      pattern="[0-9]*"
+      placeholder="?"
+      aria-label="Отговор"
+    />
+  </div>
+
+  <button id="okBtn" class="btn btn-primary">OK</button>
+
+  <div id="feedback" class="feedback" aria-live="polite"></div>
+  <div class="hint muted">Enter/Done или OK = следващ</div>
+</section>
+
+
+    <section class="card" id="resultCard" hidden>
+      <div class="row space">
+        <h2 class="h2 m0">Резултат</h2>
+        <button id="againBtn" class="btn btn-primary">Нов тест</button>
+      </div>
+
+      <div id="summary" class="summary"></div>
+
+      <div class="leaderboard">
+        <div class="row space">
+          <h2 class="h2 m0">Top 20</h2>
+          
+        </div>
+        <div id="lb2" class="lb"></div>
+      </div>
+
+      <h3 class="h3">Верни (зелено) / Грешни (червено)</h3>
+      <div id="reviewList" class="review"></div>
+    </section>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
+
+

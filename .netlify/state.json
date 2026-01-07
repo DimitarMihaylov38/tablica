@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Varna",
+			"country": {
+				"code": "BG",
+				"name": "Bulgaria"
+			},
+			"subdivision": {
+				"code": "03",
+				"name": "Varna"
+			},
+			"timezone": "Europe/Sofia",
+			"latitude": 43.2186,
+			"longitude": 27.9123,
+			"postalCode": "9000"
+		},
+		"timestamp": 1767730244251
+	}
+}

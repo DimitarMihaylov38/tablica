@@ -1,0 +1,11 @@
+{
+  "count": 20,
+  "durationSec": 60,
+  "min": 2,
+  "max": 9,
+  "useServer": true,
+  "masteryMinCorrect": 20,
+  "masteryMaxTimeMs": 45000
+}
+
+
