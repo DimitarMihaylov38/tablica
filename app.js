@@ -1,4 +1,6 @@
 let nextTimeout = null;
+let locked = false; // заключва, докато “мига” зелено/червено
+
 
 const $ = (id) => document.getElementById(id);
 
@@ -89,22 +91,15 @@ function renderQuestion() {
 
   ui.qIndex.textContent = `${currentIndex + 1}/${total}`;
   ui.progress.textContent = `${currentIndex}/${total}`;
-
   ui.expr.textContent = `${q.a} × ${q.b}`;
 
   ui.answerInput.value = "";
-  ui.answerInput.disabled = false;
-
   ui.feedback.textContent = "";
   ui.feedback.classList.remove("good", "bad");
 
-  // Най-стабилно за мобилни: фокус след tick
-  setTimeout(() => {
-    ui.answerInput.focus();
-    // click помага на iOS да покаже клавиатурата
-    ui.answerInput.click();
-  }, 0);
+  // НЕ disable, НЕ focus тук — държим фокуса жив през цялото време
 }
+
 
 function setFeedback(ok, correctAnswer) {
   ui.feedback.classList.remove("good", "bad");
@@ -205,12 +200,14 @@ async function start() {
 
   startTimer(attempt.durationSec || cfg.durationSec);
   renderQuestion();
+  ui.answerInput.focus();
+
 }
 
 async function checkAndNext() {
   if (!attempt || finishing) return;
+  if (locked) return;
 
-  // ако времето е свършило
   if (Date.now() >= endsAtMs) {
     finish("time");
     return;
@@ -222,10 +219,8 @@ async function checkAndNext() {
     return;
   }
 
-  // защита от двойно натискане
-  if (ui.answerInput.disabled) return;
-
   const correct = q.a * q.b;
+
   const raw = ui.answerInput.value;
   const given = raw === "" ? null : Number(raw);
 
@@ -233,22 +228,22 @@ async function checkAndNext() {
   answers[currentIndex] = given;
 
   setFeedback(ok, correct);
-  ui.answerInput.disabled = true;
 
   const isLast = currentIndex === cfg.count - 1;
-
   if (isLast) {
     stopTimer();
     finish("done");
     return;
   }
 
+  // ✅ заключваме за 350ms, без да губим фокус/клавиатура
+  locked = true;
+
   if (nextTimeout) {
     clearTimeout(nextTimeout);
     nextTimeout = null;
   }
 
-  // ✅ оставяме 350ms да се види зелено/червено, после следващ въпрос
   nextTimeout = setTimeout(() => {
     if (finishing || !attempt) return;
 
@@ -256,8 +251,14 @@ async function checkAndNext() {
     ui.progress.textContent = `${currentIndex}/${cfg.count}`;
 
     renderQuestion();
+
+    // ✅ input-а си остава фокусиран → можеш да пишеш веднага
+    ui.answerInput.focus();
+
+    locked = false;
   }, 350);
 }
+
 
 
 async function finish(reason) {
@@ -350,14 +351,16 @@ function wire() {
     }
   });
 
-  const okBtn = document.getElementById("okBtn");
-  if (okBtn) {
-    okBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      okBtn.blur();
-      checkAndNext().catch(err => alert(err.message));
-    });
-  }
+const okBtn = document.getElementById("okBtn");
+if (okBtn) {
+  okBtn.addEventListener("pointerdown", (e) => e.preventDefault());
+  okBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    checkAndNext().catch(err => alert(err.message));
+  });
+}
+
+
 
   const reloadBtn = document.getElementById("reloadBtn");
   if (reloadBtn) {
