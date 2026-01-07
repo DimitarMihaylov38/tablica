@@ -261,6 +261,17 @@ input::placeholder{ color: rgba(234,242,255,.55); }
   display: none !important;
 }
 
+.icon-btn{
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.icon-btn:active{ transform: scale(0.98); }
+
 
 
 

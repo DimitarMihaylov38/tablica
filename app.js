@@ -106,9 +106,9 @@ function renderQuestion() {
   }, 0);
 }
 
-
 function setFeedback(ok, correctAnswer) {
   ui.feedback.classList.remove("good", "bad");
+
   if (ok) {
     ui.feedback.textContent = "✅ Вярно!";
     ui.feedback.classList.add("good");
@@ -117,6 +117,7 @@ function setFeedback(ok, correctAnswer) {
     ui.feedback.classList.add("bad");
   }
 }
+
 
 function getNickname() {
   return ui.nickname ? ui.nickname.value.trim().slice(0, 16) : "";
@@ -215,18 +216,16 @@ async function checkAndNext() {
     return;
   }
 
-  // guard: ако липсва въпрос (race/индекс), приключваме
   const q = attempt?.questions?.[currentIndex];
   if (!q) {
     finish("done");
     return;
   }
 
-  // защита от двойно натискане (Enter + OK, или бързо Enter)
+  // защита от двойно натискане
   if (ui.answerInput.disabled) return;
 
   const correct = q.a * q.b;
-
   const raw = ui.answerInput.value;
   const given = raw === "" ? null : Number(raw);
 
@@ -234,42 +233,32 @@ async function checkAndNext() {
   answers[currentIndex] = given;
 
   setFeedback(ok, correct);
-
   ui.answerInput.disabled = true;
-  renderQuestion();
 
   const isLast = currentIndex === cfg.count - 1;
 
-  // ако е последен въпрос: спираме таймера веднага
   if (isLast) {
     stopTimer();
     finish("done");
     return;
   }
 
-  // чистим предишен timeout (ако има)
   if (nextTimeout) {
     clearTimeout(nextTimeout);
     nextTimeout = null;
   }
 
+  // ✅ оставяме 350ms да се види зелено/червено, после следващ въпрос
   nextTimeout = setTimeout(() => {
-    // ако вече приключваме или attempt е занулен — спираме
     if (finishing || !attempt) return;
 
     currentIndex++;
     ui.progress.textContent = `${currentIndex}/${cfg.count}`;
 
-    if (currentIndex >= cfg.count) {
-      stopTimer();
-      finish("done");
-      return;
-    }
-
-    ui.answerInput.disabled = false;
     renderQuestion();
-  }, 380);
+  }, 350);
 }
+
 
 async function finish(reason) {
   if (finishing) return;
@@ -354,7 +343,6 @@ function wire() {
     finishing = false;
   });
 
-  // Enter/Done = OK
   ui.answerInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -362,16 +350,21 @@ function wire() {
     }
   });
 
-  // OK бутон (само веднъж)
   const okBtn = document.getElementById("okBtn");
   if (okBtn) {
     okBtn.addEventListener("click", (e) => {
-      e.preventDefault();      // да не прави submit/scroll
-      okBtn.blur();            // да не остава фокус на бутона
+      e.preventDefault();
+      okBtn.blur();
       checkAndNext().catch(err => alert(err.message));
     });
   }
+
+  const reloadBtn = document.getElementById("reloadBtn");
+  if (reloadBtn) {
+    reloadBtn.addEventListener("click", () => location.reload());
+  }
 }
+
 
 
 (async function main() {
